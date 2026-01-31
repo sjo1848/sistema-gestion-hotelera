@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  HttpCode,
 } from '@nestjs/common'
 import { RoomsService } from './rooms.service'
 import { UpdateRoomStatusDto } from './dto/update-room-status.dto'
@@ -40,6 +41,11 @@ checkIn(
   return this.roomsService.checkIn(id, dto.guestName);
 }
 
+  @Post(':id/check-out')
+  @HttpCode(200)
+checkOut(@Param('id') id: string) {
+  return this.roomsService.checkOut(id);
+}
 
   @Delete(':id')
   remove(@Param('id') id: string) {

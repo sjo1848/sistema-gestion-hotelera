@@ -105,5 +105,28 @@ export class RoomsService {
   });
 }
 
+  async checkOut(roomId: string) {
+  const room = await this.prisma.room.findUnique({
+    where: { id: roomId },
+  });
+
+  if (!room) {
+    throw new NotFoundException('Habitación no encontrada');
+  }
+
+  if (room.status !== RoomStatus.OCCUPIED) {
+    throw new BadRequestException(
+      `No se puede hacer check-out. Estado actual: ${room.status}`,
+    );
+  }
+
+  return this.prisma.room.update({
+    where: { id: roomId },
+    data: {
+      status: RoomStatus.DIRTY,
+    },
+  });
+}
+
 
 }
