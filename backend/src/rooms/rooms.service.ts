@@ -128,5 +128,50 @@ export class RoomsService {
   });
 }
 
+  async markAsClean(roomId: string) {
+  const room = await this.prisma.room.findUnique({
+    where: { id: roomId },
+  });
+
+  if (!room) {
+    throw new NotFoundException('Habitación no encontrada');
+  }
+
+  if (room.status !== RoomStatus.DIRTY) {
+    throw new BadRequestException(
+      `No se puede marcar como limpia. Estado actual: ${room.status}`,
+    );
+  }
+
+  return this.prisma.room.update({
+    where: { id: roomId },
+    data: {
+      status: RoomStatus.AVAILABLE,
+    },
+  });
+}
+
+  async sendToMaintenance(roomId: string) {
+  const room = await this.prisma.room.findUnique({
+    where: { id: roomId },
+  });
+
+  if (!room) {
+    throw new NotFoundException('Habitación no encontrada');
+  }
+
+  if (room.status === RoomStatus.OCCUPIED) {
+    throw new BadRequestException(
+      'No se puede enviar a mantenimiento una habitación ocupada',
+    );
+  }
+
+  return this.prisma.room.update({
+    where: { id: roomId },
+    data: {
+      status: RoomStatus.MAINTENANCE,
+    },
+  });
+}
 
 }

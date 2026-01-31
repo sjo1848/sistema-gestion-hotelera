@@ -52,6 +52,18 @@ checkOut(@Param('id') id: string) {
     return this.roomsService.remove(id)
   }
 
+  @Post(':id/clean')
+  @HttpCode(200)
+markAsClean(@Param('id') id: string) {
+  return this.roomsService.markAsClean(id);
+}
+
+  @Post(':id/maintenance')
+  @HttpCode(200)
+sendToMaintenance(@Param('id') id: string) {
+  return this.roomsService.sendToMaintenance(id);
+}
+
   @Patch(':id/status')
   updateStatus(
     @Param('id') id: string,
