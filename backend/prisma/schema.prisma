@@ -1,13 +1,10 @@
 generator client {
   provider = "prisma-client-js"
-  // Forzamos el motor de librería para saltarnos la validación de Wasm
   engineType = "library"
 }
 
 datasource db {
   provider = "postgresql"
-  // Prisma 7 a veces se bloquea con env(), así que usaremos la URL directa 
-  // solo para probar si desbloquea el generador.
   url      = "postgresql://admin_hotel:palo_alto_secure_2026@postgres_db:5432/hotel_pms_dev?schema=public"
 }
 
@@ -28,6 +25,21 @@ model Room {
   price     Decimal
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+
+  // 🔥 RELACIÓN INVERSA (ESTO FALTABA)
+  stays     Stay[]
+}
+
+model Stay {
+  id         String   @id @default(uuid())
+  roomId     String
+  guestName  String
+  checkInAt  DateTime @default(now())
+  checkOutAt DateTime?
+
+  room       Room     @relation(fields: [roomId], references: [id])
+
+  createdAt  DateTime @default(now())
 }
 
 model User {
