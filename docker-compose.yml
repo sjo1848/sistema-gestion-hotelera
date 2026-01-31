@@ -1,0 +1,47 @@
+services:
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: hotel_db_dev
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hotel_network
+
+  backend:
+    build: ./backend
+    container_name: hotel_backend_dev
+    ports:
+      - "${BACKEND_PORT:-3000}:3000" # El :-3000 es un valor por defecto por si falla el .env
+    environment:
+      DATABASE_URL: "${DATABASE_URL}"
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres_db
+    networks:
+      - hotel_network
+
+  frontend:
+    build: ./frontend
+    container_name: hotel_frontend_dev
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - hotel_network
+
+networks:
+  hotel_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

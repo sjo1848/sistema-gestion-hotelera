@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+  // Forzamos el motor de librería para saltarnos la validación de Wasm
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Prisma 7 a veces se bloquea con env(), así que usaremos la URL directa 
+  // solo para probar si desbloquea el generador.
+  url      = "postgresql://admin_hotel:palo_alto_secure_2026@postgres_db:5432/hotel_pms_dev?schema=public"
+}
+
+// --- MODELOS DEL HOTEL ---
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  DIRTY
+  MAINTENANCE
+}
+
+model Room {
+  id        String     @id @default(uuid())
+  number    String     @unique
+  type      String
+  status    RoomStatus @default(AVAILABLE)
+  price     Decimal
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  name     String
+  role     String @default("RECEPTIONIST")
+}

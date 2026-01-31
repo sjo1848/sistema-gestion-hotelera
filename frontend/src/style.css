@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* Esto asegura que los colores que definimos en el config se apliquen */
+@theme {
+  --color-available: #22c55e;
+  --color-occupied: #ef4444;
+  --color-dirty: #eab308;
+  --color-maintenance: #64748b;
+  --color-hotel-blue: #1e293b;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900;
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+}

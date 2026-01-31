@@ -1,0 +1,14 @@
+# Node
+node_modules
+dist
+
+# Env
+.env
+.env.*
+
+# Prisma
+.prisma
+
+# Docker / DB
+postgres_data
+*.log
