@@ -10,6 +10,8 @@ import {
 import { RoomsService } from './rooms.service'
 import { UpdateRoomStatusDto } from './dto/update-room-status.dto'
 import { CreateRoomDto } from './dto/create-room.dto'
+import { CheckInDto } from './dto/check-in.dto';
+
 
 @Controller('rooms')
 export class RoomsController {
@@ -28,6 +30,14 @@ export class RoomsController {
   @Post()
 create(@Body() dto: CreateRoomDto) {
   return this.roomsService.create(dto)
+}
+
+  @Post(':id/check-in')
+checkIn(
+  @Param('id') id: string,
+  @Body() dto: CheckInDto,
+) {
+  return this.roomsService.checkIn(id, dto.guestName);
 }
 
 

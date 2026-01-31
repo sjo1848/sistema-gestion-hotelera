@@ -81,4 +81,29 @@ export class RoomsService {
       data: { status: newStatus },
     })
   }
+
+  async checkIn(roomId: string, guestName: string) {
+  const room = await this.prisma.room.findUnique({
+    where: { id: roomId },
+  });
+
+  if (!room) {
+    throw new NotFoundException('Habitación no encontrada');
+  }
+
+  if (room.status !== RoomStatus.AVAILABLE) {
+    throw new BadRequestException(
+      `No se puede hacer check-in. Estado actual: ${room.status}`,
+    );
+  }
+
+  return this.prisma.room.update({
+    where: { id: roomId },
+    data: {
+      status: RoomStatus.OCCUPIED,
+    },
+  });
+}
+
+
 }
