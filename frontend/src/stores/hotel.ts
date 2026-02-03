@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
 import api from '../lib/api';
+import { getErrorMessage } from '../lib/errors';
+import type { RoomStatus, RoomType } from '../lib/roomFilters';
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -7,8 +9,8 @@ let toastTimer: ReturnType<typeof setTimeout> | null = null;
 interface Room {
   id: string;
   number: string;
-  type: string;
-  status: 'AVAILABLE' | 'OCCUPIED' | 'DIRTY' | 'MAINTENANCE';
+  type: RoomType;
+  status: RoomStatus;
   price: number;
 }
 
@@ -43,8 +45,8 @@ export const useHotelStore = defineStore('hotel', {
       try {
         const response = await api.get('/rooms');
         this.rooms = response.data;
-      } catch (error: any) {
-        this.error = error?.response?.data?.message || 'Error cargando habitaciones';
+      } catch (error: unknown) {
+        this.error = getErrorMessage(error, 'Error cargando habitaciones');
         console.error("Error cargando habitaciones:", error);
       } finally {
         this.loading = false;
@@ -55,8 +57,8 @@ export const useHotelStore = defineStore('hotel', {
         await api.post(`/rooms/${roomId}/check-in`, { guestName });
         this.setToast('Check-in registrado', '');
         await this.fetchRooms();
-      } catch (error: any) {
-        this.setToast('', error?.response?.data?.message || 'Error en check-in');
+      } catch (error: unknown) {
+        this.setToast('', getErrorMessage(error, 'Error en check-in'));
       }
     },
     async checkOut(roomId: string) {
@@ -64,8 +66,8 @@ export const useHotelStore = defineStore('hotel', {
         await api.post(`/rooms/${roomId}/check-out`);
         this.setToast('Check-out registrado', '');
         await this.fetchRooms();
-      } catch (error: any) {
-        this.setToast('', error?.response?.data?.message || 'Error en check-out');
+      } catch (error: unknown) {
+        this.setToast('', getErrorMessage(error, 'Error en check-out'));
       }
     },
     async markClean(roomId: string) {
@@ -73,8 +75,8 @@ export const useHotelStore = defineStore('hotel', {
         await api.post(`/rooms/${roomId}/clean`);
         this.setToast('Habitación marcada como limpia', '');
         await this.fetchRooms();
-      } catch (error: any) {
-        this.setToast('', error?.response?.data?.message || 'Error al limpiar');
+      } catch (error: unknown) {
+        this.setToast('', getErrorMessage(error, 'Error al limpiar'));
       }
     },
     async sendMaintenance(roomId: string) {
@@ -82,17 +84,17 @@ export const useHotelStore = defineStore('hotel', {
         await api.post(`/rooms/${roomId}/maintenance`);
         this.setToast('Habitación enviada a mantenimiento', '');
         await this.fetchRooms();
-      } catch (error: any) {
-        this.setToast('', error?.response?.data?.message || 'Error en mantenimiento');
+      } catch (error: unknown) {
+        this.setToast('', getErrorMessage(error, 'Error en mantenimiento'));
       }
     },
-    async createRoom(payload: { number: string; type: string; price: number; status?: Room['status'] }) {
+    async createRoom(payload: { number: string; type: RoomType; price: number; status?: Room['status'] }) {
       try {
         await api.post('/rooms', payload);
         this.setToast('Habitación creada', '');
         await this.fetchRooms();
-      } catch (error: any) {
-        this.setToast('', error?.response?.data?.message || 'Error al crear habitación');
+      } catch (error: unknown) {
+        this.setToast('', getErrorMessage(error, 'Error al crear habitación'));
       }
     },
   }

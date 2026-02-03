@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{ room: any }>();
+import type { Room } from '../lib/roomFilters';
+
+defineProps<{ room: Room }>();
 defineEmits<{
   (e: 'check-in', roomId: string): void;
   (e: 'check-out', roomId: string): void;

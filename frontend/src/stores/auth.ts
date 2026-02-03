@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '../lib/api';
+import { getErrorMessage } from '../lib/errors';
 
 type User = {
   id: string;
@@ -25,8 +26,8 @@ export const useAuthStore = defineStore('auth', {
         this.user = response.data.user;
         localStorage.setItem('hotel_token', this.token);
         // TODO: Move access token to memory-only or HttpOnly cookie for production hardening.
-      } catch (err: any) {
-        this.error = err?.response?.data?.message || 'Error de login';
+      } catch (err: unknown) {
+        this.error = getErrorMessage(err, 'Error de login');
       } finally {
         this.loading = false;
       }

@@ -8,7 +8,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint \"src/**/*.{ts,vue}\" --fix",
+    "lint:ci": "eslint \"src/**/*.{ts,vue}\""
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
@@ -21,7 +23,12 @@
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
     "autoprefixer": "^10.4.23",
+    "eslint": "^9.21.0",
+    "eslint-plugin-vue": "^10.4.0",
+    "vue-eslint-parser": "^10.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
     "typescript": "~5.9.3",
