@@ -1,14 +1,11 @@
 generator client {
   provider = "prisma-client-js"
-  engineType = "library"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://admin_hotel:palo_alto_secure_2026@postgres_db:5432/hotel_pms_dev?schema=public"
+  url      = env("DATABASE_URL")
 }
-
-// --- MODELOS DEL HOTEL ---
 
 enum RoomStatus {
   AVAILABLE
@@ -17,8 +14,16 @@ enum RoomStatus {
   MAINTENANCE
 }
 
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+  name     String
+  role     String @default("RECEPTIONIST")
+}
+
 model Room {
-  id        String     @id @default(uuid())
+  id        String     @id @default(cuid())
   number    String     @unique
   type      String
   status    RoomStatus @default(AVAILABLE)
@@ -26,26 +31,20 @@ model Room {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  // 🔥 RELACIÓN INVERSA (ESTO FALTABA)
   stays     Stay[]
 }
 
 model Stay {
-  id         String   @id @default(uuid())
+  id         String    @id @default(cuid())
   roomId     String
   guestName  String
-  checkInAt  DateTime @default(now())
+  checkInAt  DateTime  @default(now())
   checkOutAt DateTime?
 
-  room       Room     @relation(fields: [roomId], references: [id])
+  room       Room      @relation(fields: [roomId], references: [id])
 
-  createdAt  DateTime @default(now())
-}
+  createdAt  DateTime  @default(now())
 
-model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  password String
-  name     String
-  role     String @default("RECEPTIONIST")
+  @@index([roomId])
+  @@index([checkInAt])
 }

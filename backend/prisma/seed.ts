@@ -1,4 +1,5 @@
 import { PrismaClient, RoomStatus } from '@prisma/client'
+import * as bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
 
@@ -6,18 +7,44 @@ async function main() {
   console.log('🌱 Iniciando seed del sistema hotelero...')
 
   // 1️⃣ Admin de respaldo (idempotente)
+  const hashedAdminPassword = await bcrypt.hash('admin_password_123', 10)
+
   await prisma.user.upsert({
     where: { email: 'admin@paloalto.com' },
-    update: {},
+    update: {
+      password: hashedAdminPassword,
+      name: 'Admin Hotel',
+      role: 'ADMIN',
+    },
     create: {
       email: 'admin@paloalto.com',
-      password: 'admin_password_123', // ⚠️ luego bcrypt
+      password: hashedAdminPassword,
       name: 'Admin Hotel',
       role: 'ADMIN',
     },
   })
 
   console.log('👤 Admin verificado')
+
+  // 1️⃣ Staff de respaldo (idempotente)
+  const hashedStaffPassword = await bcrypt.hash('staff_password_123', 10)
+
+  await prisma.user.upsert({
+    where: { email: 'staff@paloalto.com' },
+    update: {
+      password: hashedStaffPassword,
+      name: 'Staff Hotel',
+      role: 'STAFF',
+    },
+    create: {
+      email: 'staff@paloalto.com',
+      password: hashedStaffPassword,
+      name: 'Staff Hotel',
+      role: 'STAFF',
+    },
+  })
+
+  console.log('👤 Staff verificado')
 
   // 2️⃣ Habitaciones 1–20
   console.log('🏨 Generando habitaciones...')

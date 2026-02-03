@@ -7,14 +7,19 @@ import {
   Patch,
   Post,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common'
 import { RoomsService } from './rooms.service'
 import { UpdateRoomStatusDto } from './dto/update-room-status.dto'
 import { CreateRoomDto } from './dto/create-room.dto'
 import { CheckInDto } from './dto/check-in.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 
 @Controller('rooms')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
@@ -29,6 +34,7 @@ export class RoomsController {
   }
 
   @Post()
+  @Roles('ADMIN')
 create(@Body() dto: CreateRoomDto) {
   return this.roomsService.create(dto)
 }
@@ -48,6 +54,7 @@ checkOut(@Param('id') id: string) {
 }
 
   @Delete(':id')
+  @Roles('ADMIN')
   remove(@Param('id') id: string) {
     return this.roomsService.remove(id)
   }

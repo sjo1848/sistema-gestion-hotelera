@@ -1,9 +1,11 @@
-import { IsString, IsUUID } from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator'
 
 export class CheckInDto {
-  @IsUUID()
+  @IsString()
+  @IsNotEmpty()
   roomId: string
 
   @IsString()
+  @IsNotEmpty()
   guestName: string
 }

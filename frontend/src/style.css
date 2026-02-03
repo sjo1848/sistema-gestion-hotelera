@@ -1,16 +1,202 @@
 @import "tailwindcss";
 
-/* Esto asegura que los colores que definimos en el config se apliquen */
 @theme {
   --color-available: #22c55e;
   --color-occupied: #ef4444;
   --color-dirty: #eab308;
   --color-maintenance: #64748b;
   --color-hotel-blue: #1e293b;
+  --color-hotel-ink: #0b0e12;
+  --color-hotel-cream: #f6f1e8;
 }
 
 body {
-  @apply bg-slate-50 text-slate-900;
+  @apply text-slate-100;
   margin: 0;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+.page-noise {
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(246, 241, 232, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(34, 197, 94, 0.08), transparent 45%),
+    radial-gradient(circle at 60% 80%, rgba(239, 68, 68, 0.08), transparent 45%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass-card {
+  background: rgba(15, 18, 24, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+}
+
+.input-dark {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 14, 18, 0.9);
+  color: #f6f1e8;
+  outline: none;
+}
+
+.input-dark:focus {
+  border-color: rgba(246, 241, 232, 0.6);
+  box-shadow: 0 0 0 3px rgba(246, 241, 232, 0.15);
+}
+
+.btn-primary {
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #22c55e, #16a34a);
+  color: #0b0e12;
+  font-weight: 700;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(246, 241, 232, 0.2);
+  color: #f6f1e8;
+  background: transparent;
+}
+
+.chip {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 14, 18, 0.6);
+  color: #f6f1e8;
+  font-size: 12px;
+}
+
+.chip.active {
+  border-color: rgba(246, 241, 232, 0.6);
+  box-shadow: 0 0 0 2px rgba(246, 241, 232, 0.15);
+}
+
+.metric-card {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(15, 18, 24, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(246, 241, 232, 0.6);
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.card-action {
+  font-size: 12px;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(12, 14, 18, 0.45);
+  color: #f6f1e8;
+}
+
+.card-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 8, 12, 0.7);
+  z-index: 20;
+}
+
+.card-animate {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 420ms ease forwards;
+}
+
+.skeleton-card {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 18, 24, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(120deg, transparent, rgba(246, 241, 232, 0.08), transparent);
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-line {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.w-12 { width: 3rem; }
+.w-16 { width: 4rem; }
+.w-20 { width: 5rem; }
+.w-24 { width: 6rem; }
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.toast {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 18, 24, 0.8);
+}
+
+.toast-success {
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.toast-error {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.4);
 }
