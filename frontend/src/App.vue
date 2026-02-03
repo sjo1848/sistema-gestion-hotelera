@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useHotelStore } from './stores/hotel';
 import { useAuthStore } from './stores/auth';
 import RoomCard from './components/RoomCard.vue';
+import { filterRooms, type RoomStatus, type RoomType } from './lib/roomFilters';
 
 const hotelStore = useHotelStore();
 const authStore = useAuthStore();
@@ -15,14 +16,19 @@ const showCheckIn = ref(false);
 const showCreateRoom = ref(false);
 
 const searchText = ref('');
-const statusFilter = ref<'ALL' | 'AVAILABLE' | 'OCCUPIED' | 'DIRTY' | 'MAINTENANCE'>('ALL');
-const typeFilter = ref<'ALL' | 'Simple' | 'Doble' | 'Suite' | 'Presidential'>('ALL');
+const statusFilter = ref<'ALL' | RoomStatus>('ALL');
+const typeFilter = ref<'ALL' | RoomType>('ALL');
 
-const newRoom = ref({
+const newRoom = ref<{
+  number: string;
+  type: RoomType;
+  price: number;
+  status: RoomStatus;
+}>({
   number: '',
   type: 'Simple',
   price: 50,
-  status: 'AVAILABLE' as const,
+  status: 'AVAILABLE',
 });
 
 const isAuthed = computed(() => !!authStore.token);
@@ -101,17 +107,13 @@ const submitConfirm = async () => {
 
 const confirmAction = ref<null | { title: string; message: string; action: () => Promise<void> }>(null);
 
-const filteredRooms = computed(() => {
-  const text = searchText.value.trim().toLowerCase();
-  return hotelStore.rooms.filter((room) => {
-    const matchesText = text
-      ? room.number.toLowerCase().includes(text) || room.type.toLowerCase().includes(text)
-      : true;
-    const matchesStatus = statusFilter.value === 'ALL' ? true : room.status === statusFilter.value;
-    const matchesType = typeFilter.value === 'ALL' ? true : room.type === typeFilter.value;
-    return matchesText && matchesStatus && matchesType;
-  });
-});
+const filteredRooms = computed(() =>
+  filterRooms(hotelStore.rooms, {
+    text: searchText.value,
+    status: statusFilter.value,
+    type: typeFilter.value,
+  }),
+);
 
 const openCreateRoom = () => {
   newRoom.value = { number: '', type: 'Simple', price: 50, status: 'AVAILABLE' };
