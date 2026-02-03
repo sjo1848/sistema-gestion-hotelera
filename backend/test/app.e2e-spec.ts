@@ -31,6 +31,11 @@ describe('Hotel API (e2e)', () => {
   });
 
   afterAll(async () => {
+    if (createdRoomId) {
+      await request(app.getHttpServer())
+        .delete(`/api/v1/rooms/${createdRoomId}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+    }
     await app.close();
   });
 

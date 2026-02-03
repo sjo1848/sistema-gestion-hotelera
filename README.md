@@ -83,6 +83,7 @@ npm run dev
 ```
 
 ## Notas de seguridad
-- JWT expira en 12 horas.
+- Access token expira en 15 minutos.
+- Refresh token expira en 7 días (HttpOnly cookie).
 - Passwords con bcrypt cost 10.
-- TODO: Migrar JWT a HttpOnly cookies + refresh token para producción.
+- Refresh tokens ya usan HttpOnly cookies.
