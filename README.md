@@ -19,6 +19,20 @@ docker-compose up --build
 Backend: `http://localhost:3000/api/v1`  
 Frontend: `http://localhost:5173`
 
+## Deploy (básico)
+Imágenes de producción:
+- Backend: `backend/Dockerfile.prod`
+- Frontend: `frontend/Dockerfile.prod`
+
+Ejemplo build:
+```bash
+docker build -f backend/Dockerfile.prod -t hotel-backend:prod ./backend
+docker build -f frontend/Dockerfile.prod -t hotel-frontend:prod ./frontend
+```
+
+## Archivo .env ejemplo
+Usa `.env.example` como base para producción.
+
 ## Variables de entorno
 Archivo raíz `.env`:
 ```
