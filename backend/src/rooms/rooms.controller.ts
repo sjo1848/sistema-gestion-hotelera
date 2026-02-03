@@ -19,6 +19,15 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 
+const roomsErrorExample = {
+  code: 'RESOURCE_NOT_FOUND',
+  message: 'Habitación no encontrada',
+  details: {},
+  traceId: 'req-123',
+  path: '/api/v1/rooms/room_id',
+  timestamp: '2026-02-03T03:40:00.000Z',
+};
+
 @ApiTags('Rooms')
 @ApiBearerAuth()
 @Controller('rooms')
@@ -29,6 +38,7 @@ export class RoomsController {
   @Get()
   @ApiOperation({ summary: 'List rooms' })
   @ApiResponse({ status: 200, description: 'Rooms list' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
   findAll() {
     return this.roomsService.findAll()
   }
@@ -36,6 +46,8 @@ export class RoomsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get room by id' })
   @ApiResponse({ status: 200, description: 'Room detail' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
+  @ApiResponse({ status: 404, description: 'Room not found', example: roomsErrorExample })
   findOne(@Param('id') id: string) {
     return this.roomsService.findOne(id)
   }
@@ -44,6 +56,8 @@ export class RoomsController {
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Create room (ADMIN)' })
   @ApiResponse({ status: 201, description: 'Room created' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
+  @ApiResponse({ status: 403, description: 'Forbidden', example: roomsErrorExample })
 create(@Body() dto: CreateRoomDto) {
   return this.roomsService.create(dto)
 }
@@ -51,6 +65,9 @@ create(@Body() dto: CreateRoomDto) {
   @Post(':id/check-in')
   @ApiOperation({ summary: 'Check-in by room id' })
   @ApiResponse({ status: 200, description: 'Stay created' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
+  @ApiResponse({ status: 404, description: 'Room not found', example: roomsErrorExample })
+  @ApiResponse({ status: 409, description: 'Conflict', example: roomsErrorExample })
 checkIn(
   @Param('id') id: string,
   @Body() dto: CheckInDto,
@@ -62,6 +79,9 @@ checkIn(
   @HttpCode(200)
   @ApiOperation({ summary: 'Check-out by room id' })
   @ApiResponse({ status: 200, description: 'Stay closed' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
+  @ApiResponse({ status: 404, description: 'Room not found', example: roomsErrorExample })
+  @ApiResponse({ status: 409, description: 'Conflict', example: roomsErrorExample })
 checkOut(@Param('id') id: string) {
   return this.roomsService.checkOut(id);
 }
@@ -70,6 +90,9 @@ checkOut(@Param('id') id: string) {
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Delete room (ADMIN)' })
   @ApiResponse({ status: 200, description: 'Room deleted' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
+  @ApiResponse({ status: 403, description: 'Forbidden', example: roomsErrorExample })
+  @ApiResponse({ status: 404, description: 'Room not found', example: roomsErrorExample })
   remove(@Param('id') id: string) {
     return this.roomsService.remove(id)
   }
@@ -78,6 +101,9 @@ checkOut(@Param('id') id: string) {
   @HttpCode(200)
   @ApiOperation({ summary: 'Mark room as clean' })
   @ApiResponse({ status: 200, description: 'Room updated' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
+  @ApiResponse({ status: 404, description: 'Room not found', example: roomsErrorExample })
+  @ApiResponse({ status: 409, description: 'Conflict', example: roomsErrorExample })
 markAsClean(@Param('id') id: string) {
   return this.roomsService.markAsClean(id);
 }
@@ -86,6 +112,9 @@ markAsClean(@Param('id') id: string) {
   @HttpCode(200)
   @ApiOperation({ summary: 'Send room to maintenance' })
   @ApiResponse({ status: 200, description: 'Room updated' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
+  @ApiResponse({ status: 404, description: 'Room not found', example: roomsErrorExample })
+  @ApiResponse({ status: 409, description: 'Conflict', example: roomsErrorExample })
 sendToMaintenance(@Param('id') id: string) {
   return this.roomsService.sendToMaintenance(id);
 }
@@ -93,6 +122,9 @@ sendToMaintenance(@Param('id') id: string) {
   @Patch(':id/status')
   @ApiOperation({ summary: 'Update room status' })
   @ApiResponse({ status: 200, description: 'Room updated' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', example: roomsErrorExample })
+  @ApiResponse({ status: 404, description: 'Room not found', example: roomsErrorExample })
+  @ApiResponse({ status: 409, description: 'Conflict', example: roomsErrorExample })
   updateStatus(
     @Param('id') id: string,
     @Body() dto: UpdateRoomStatusDto,
