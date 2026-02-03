@@ -32,9 +32,10 @@ export class AuthService {
       },
     });
 
-    const token = await this.signToken(user);
+    const tokens = await this.issueTokens(user);
     return {
-      accessToken: token,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
       user: this.sanitizeUser(user),
     };
   }
@@ -53,9 +54,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = await this.signToken(user);
+    const tokens = await this.issueTokens(user);
     return {
-      accessToken: token,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
       user: this.sanitizeUser(user),
     };
   }
@@ -72,8 +74,38 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  private async signToken(user: { id: string; email: string; role: string; name: string }) {
-    return this.jwtService.signAsync(
+  async refresh(userId: string, refreshToken: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    const valid = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (!valid) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    const tokens = await this.issueTokens(user);
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: this.sanitizeUser(user),
+    };
+  }
+
+  async verifyRefreshToken(token: string) {
+    return this.jwtService.verifyAsync(token, {
+      secret: process.env.JWT_SECRET,
+    });
+  }
+
+  async logout(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
+  }
+
+  private async issueTokens(user: { id: string; email: string; role: string; name: string }) {
+    const accessToken = await this.jwtService.signAsync(
       {
         sub: user.id,
         email: user.email,
@@ -82,9 +114,22 @@ export class AuthService {
       },
       {
         secret: process.env.JWT_SECRET,
-        expiresIn: '12h',
+        expiresIn: '15m',
       },
     );
+    const refreshToken = await this.jwtService.signAsync(
+      { sub: user.id },
+      {
+        secret: process.env.JWT_SECRET,
+        expiresIn: '7d',
+      },
+    );
+    const hashedRefresh = await bcrypt.hash(refreshToken, 10);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: hashedRefresh },
+    });
+    return { accessToken, refreshToken };
   }
 
   private sanitizeUser(user: { id: string; email: string; role: string; name: string }) {

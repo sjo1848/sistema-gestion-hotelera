@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { requestLogger } from './common/middleware/request-logger.middleware';
 import { requestId } from './common/middleware/request-id.middleware';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -23,6 +24,9 @@ async function bootstrap() {
   // Observabilidad: request id y logs estructurados
   app.use(requestId);
   app.use(requestLogger);
+
+  // Cookies
+  app.use(cookieParser());
 
   // Seguridad: headers con helmet
   app.use(helmet());

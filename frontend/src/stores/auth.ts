@@ -24,7 +24,7 @@ export const useAuthStore = defineStore('auth', {
         this.token = response.data.accessToken;
         this.user = response.data.user;
         localStorage.setItem('hotel_token', this.token);
-        // TODO: Replace localStorage with HttpOnly cookie + refresh token for production hardening.
+        // TODO: Move access token to memory-only or HttpOnly cookie for production hardening.
       } catch (err: any) {
         this.error = err?.response?.data?.message || 'Error de login';
       } finally {
@@ -32,7 +32,10 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async me() {
-      if (!this.token) return;
+      if (!this.token) {
+        const ok = await this.refresh();
+        if (!ok) return;
+      }
       try {
         const response = await api.get('/auth/me');
         this.user = response.data;
@@ -40,7 +43,20 @@ export const useAuthStore = defineStore('auth', {
         this.logout();
       }
     },
+    async refresh() {
+      try {
+        const response = await api.post('/auth/refresh');
+        this.token = response.data.accessToken;
+        this.user = response.data.user;
+        localStorage.setItem('hotel_token', this.token);
+        return true;
+      } catch {
+        this.logout();
+        return false;
+      }
+    },
     logout() {
+      api.post('/auth/logout').catch(() => undefined);
       this.token = '';
       this.user = null;
       localStorage.removeItem('hotel_token');
