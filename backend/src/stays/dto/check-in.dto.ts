@@ -1,9 +1,14 @@
-import { IsString, IsUUID } from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 export class CheckInDto {
-  @IsUUID()
+  @ApiProperty({ example: 'room_id' })
+  @IsString()
+  @IsNotEmpty()
   roomId: string
 
+  @ApiProperty({ example: 'Juan Perez' })
   @IsString()
+  @IsNotEmpty()
   guestName: string
 }

@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - feat/**
+      - fix/**
+      - chore/**
+      - docs/**
+      - test/**
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: admin_hotel
+          POSTGRES_PASSWORD: palo_alto_secure_2026
+          POSTGRES_DB: hotel_pms_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U admin_hotel"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://admin_hotel:palo_alto_secure_2026@localhost:5432/hotel_pms_dev?schema=public
+      JWT_SECRET: test_secret
+      CORS_ORIGINS: http://localhost:5173
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache-dependency-path: backend/package-lock.json
+      - name: Install backend deps
+        run: npm ci
+        working-directory: backend
+      - name: Prisma generate
+        run: npx prisma generate
+        working-directory: backend
+      - name: Prisma migrate deploy
+        run: npx prisma migrate deploy
+        working-directory: backend
+      - name: Prisma seed
+        run: npx prisma db seed
+        working-directory: backend
+      - name: Backend E2E tests
+        run: npm run test:e2e
+        working-directory: backend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install frontend deps
+        run: npm ci
+        working-directory: frontend
+      - name: Frontend tests
+        run: npm run test
+        working-directory: frontend

@@ -6,12 +6,16 @@ import {
 import { PrismaService } from '../prisma/prisma.service'
 import { RoomStatus } from '@prisma/client'
 import { CreateRoomDto } from './dto/create-room.dto'
+import { StaysService } from '../stays/stays.service'
 
 
 
 @Injectable()
 export class RoomsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly staysService: StaysService,
+  ) {}
 
   async findAll() {
     return this.prisma.room.findMany({
@@ -83,49 +87,11 @@ export class RoomsService {
   }
 
   async checkIn(roomId: string, guestName: string) {
-  const room = await this.prisma.room.findUnique({
-    where: { id: roomId },
-  });
-
-  if (!room) {
-    throw new NotFoundException('Habitación no encontrada');
-  }
-
-  if (room.status !== RoomStatus.AVAILABLE) {
-    throw new BadRequestException(
-      `No se puede hacer check-in. Estado actual: ${room.status}`,
-    );
-  }
-
-  return this.prisma.room.update({
-    where: { id: roomId },
-    data: {
-      status: RoomStatus.OCCUPIED,
-    },
-  });
+  return this.staysService.checkIn(roomId, guestName, new Date())
 }
 
   async checkOut(roomId: string) {
-  const room = await this.prisma.room.findUnique({
-    where: { id: roomId },
-  });
-
-  if (!room) {
-    throw new NotFoundException('Habitación no encontrada');
-  }
-
-  if (room.status !== RoomStatus.OCCUPIED) {
-    throw new BadRequestException(
-      `No se puede hacer check-out. Estado actual: ${room.status}`,
-    );
-  }
-
-  return this.prisma.room.update({
-    where: { id: roomId },
-    data: {
-      status: RoomStatus.DIRTY,
-    },
-  });
+  return this.staysService.checkOut(roomId, new Date())
 }
 
   async markAsClean(roomId: string) {
