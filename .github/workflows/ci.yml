@@ -62,7 +62,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: none
       - name: Install frontend deps
         run: |
           rm -f package-lock.json
