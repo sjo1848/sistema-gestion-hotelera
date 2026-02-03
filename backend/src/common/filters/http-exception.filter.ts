@@ -13,27 +13,48 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+    const requestId = (request as any).requestId ?? null;
 
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const message = exception.message || 'Error';
       const responseBody = exception.getResponse();
 
+      const log = {
+        level: status >= 500 ? 'error' : 'warn',
+        msg: 'http_exception',
+        status,
+        path: request.url,
+        method: request.method,
+        requestId,
+        timestamp: new Date().toISOString(),
+      };
+      console.log(JSON.stringify(log));
+
       return response.status(status).json({
         code: this.mapCode(status, message),
         message,
         details: typeof responseBody === 'object' ? responseBody : {},
-        traceId: request.headers['x-request-id'] ?? null,
+        traceId: requestId,
         path: request.url,
         timestamp: new Date().toISOString(),
       });
     }
 
+    console.log(JSON.stringify({
+      level: 'error',
+      msg: 'unhandled_exception',
+      path: request.url,
+      method: request.method,
+      requestId,
+      timestamp: new Date().toISOString(),
+    }));
+
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       code: 'INTERNAL_SERVER_ERROR',
       message: 'Unexpected error',
       details: {},
-      traceId: request.headers['x-request-id'] ?? null,
+      traceId: requestId,
       path: request.url,
       timestamp: new Date().toISOString(),
     });
