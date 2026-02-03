@@ -37,6 +37,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
           cache-dependency-path: backend/package-lock.json
       - name: Install backend deps
         run: npm ci
@@ -61,7 +62,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: none
       - name: Install frontend deps
         run: |
           rm -f package-lock.json
