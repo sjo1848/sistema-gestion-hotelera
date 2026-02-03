@@ -20,6 +20,7 @@ model User {
   password String
   name     String
   role     String @default("RECEPTIONIST")
+  refreshToken String?
 }
 
 model Room {
